@@ -8,7 +8,7 @@ Remember to check in both cases the checkbox: API enabled
 **GET** request:
 - GET all current task
 - GET all image (instead image could be: host/task/group/history...)
-- GET information of particular image using ID. (As said above, could be host/task ecc), all use the same form /<OBJECT>/<ID_OBJECT>
+- GET information of particular image using ID. (As said above, could be host/task ecc), all use the same form 
   
 **POST** request:
 - CREATE an host by sending a JSON object
