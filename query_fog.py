@@ -11,9 +11,6 @@ apitoken='apitoken'
 ip_address='http://192.168.1.1'
 headers = {'fog-user-token': usertoken, 'fog-api-token':apitoken }
 
-#To run via console:
-#curl -H 'fog-api-token: apitoken' -H 'fog-user-token: usertoken' -X GET http://192.168.1.1/fog/task/current -o listalltasks.json
-
 
 ###GET REQUEST
 
@@ -69,12 +66,13 @@ snapin_task={
 # 14 = WAKE UP
 snapin_task = '{"taskTypeID":12,"taskName": "test_python","shutdown": "true","deploySnapins": 4,"wol": "true" }'
 
-#curl -H 'fog-api-token: apitoken' -H 'fog-user-token: usertoken' -H 'Content-Type: application/json' -X POST -d '{"taskTypeID":12,"deploySnapins":4}' http://192.168.1.1/fog/host/7/task
 
 r = requests.post(ip_address+'/fog/host/7/task', headers=headers, data=snapin_task)
 
-print('STATUS: ',r)
 
-print('RESPONSE: ',r.content)
+#VIA COMMAND LINE
+
+#curl -H 'fog-api-token: apitoken' -H 'fog-user-token: usertoken' -X GET http://192.168.1.1/fog/task/current -o listalltasks.json
+#curl -H 'fog-api-token: apitoken' -H 'fog-user-token: usertoken' -H 'Content-Type: application/json' -X POST -d '{"taskTypeID":12,"deploySnapins":4}' http://192.168.1.1/fog/host/7/task
 
 
