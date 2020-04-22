@@ -17,11 +17,6 @@ Remember to check in both cases the checkbox: API enabled
 - DELETE a particular host
 
 ### SNAPIN
-To create a snapin task, we assume:
-snapin ID = 4
-host ID = 7
-URL TO CALL: POST --> http://ipaddress/fog/host/7/task
-
 We need to send to the request a JSON object with this fields:
 ```
 snapin_task={
