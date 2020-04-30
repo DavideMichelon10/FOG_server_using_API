@@ -1,7 +1,7 @@
 # FOG_server_using_API
 
 This script discover which Virtual machines on Virtualbox are registered as an host on FOG server. After that, there is the possibility to turn it on/off. 
-At [this link](API_example/README.md) I explained in details how to use APIs querying FOG server
+At [this link](API_example/) I explained in details how to use APIs querying FOG server
 
 The script is composed by three parts:
 1) Get all hosts on FOG server: using *GET:/fog/host*
