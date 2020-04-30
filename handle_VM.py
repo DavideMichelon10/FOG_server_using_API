@@ -18,15 +18,13 @@ class FogHost(object):
 
 
 class HostInVBox(object):
-    class_counter = 1
 
-    def __init__(self, name, vb_name, mac, status):
+    def __init__(self, id, name, vb_name, mac, status):
         self.name = name
         self.vb_name = vb_name
         self.mac = mac
         self.status = status
-        self.id = HostInVBox.class_counter
-        HostInVBox.class_counter += 1
+        self.id = id
 
 
 # GET VirtualBox machine
@@ -122,7 +120,7 @@ def format_json(body):
 def vb_contain_fog_host(vm, fog_hosts, host_in_vb):
     for host in fog_hosts:
         if host.mac == vm.mac:
-            host_in_vb.append(HostInVBox(host.name, vm.vb_name, host.mac, vm.status))
+            host_in_vb.append(HostInVBox(host.id, host.name, vm.vb_name, host.mac, vm.status))
 
 
 def check_input(msg):
@@ -132,6 +130,31 @@ def check_input(msg):
             return choose
         else:
             print("Sorry, unrecognized character. Please, try again")
+
+
+# I suppose I've already created an empty snapin with id = 1
+def turn_off_vm(selected_host, headers, ip_address):
+    print(selected_host.id)
+    snapin_task = '{"taskTypeID":12,"taskName": "shutdown","shutdown": "true","deploySnapins": 1,"wol": "false" }'
+    choose = check_input('Host selected is on. Would you like to turn off? [Y/n]')
+    if choose.upper() != "N":
+        requests.post(ip_address + '/fog/host/' + selected_host.id + '/task', headers=headers, data=snapin_task)
+        print(selected_host.vb_name, " is turning off...")
+
+        # subprocess.run(["VBoxManage", "controlvm", selected_host.vb_name, "poweroff", "--type", "headless"],
+        # stdout=subprocess.PIPE)
+
+
+# I suppose I've already created an empty snapin with id = 1
+def turn_on_vm(selected_host, headers, ip_address):
+    choose = check_input('Host selected is off. Would you like to turn on?[Y/n]')
+    snapin_task = '{"taskTypeID":12,"taskName": "shutdown","shutdown": "false","deploySnapins": 1,"wol": "true" }'
+    if choose.upper() != "N":
+        requests.post(ip_address + '/fog/host/' + selected_host.id + '/task', headers=headers, data=snapin_task)
+        print(selected_host.vb_name, " is turning on...")
+
+        # subprocess.run(["VBoxManage", "startvm", selected_host.vb_name, "--type", "headless"],
+        #               stdout=subprocess.PIPE)
 
 
 def main():
@@ -146,6 +169,7 @@ def main():
 
     get_hosts = requests.get(ip_address + '/fog/host', headers=headers)
     body = str(get_hosts.content)
+    print(body)
     formatted_body = format_json(body)
 
     body_json = json.loads(formatted_body)
@@ -184,6 +208,8 @@ def main():
         print("ID: ", vm_host.id, " NAME: ", vm_host.name, " VBox NAME: ", vm_host.vb_name, " MAC: ", vm_host.mac,
               " STATUS:", vm_host.status)
 
+    r = requests.get(ip_address + '/fog/snapin', headers=headers)
+    print('snpin: ', r.content)
     is_present = False
     while not is_present:
         id_selected = input("Choose on which host would you turn on/off: ")
@@ -193,21 +219,9 @@ def main():
                 is_present = True
 
         if selected_host.status == 'ON':
-            choose = check_input('Host selected is on. Would you like to turn off? [Y/n]')
-
-            # POWER OFF VM
-            if choose.upper() != "N":
-                print(selected_host.vb_name)
-                subprocess.run(["VBoxManage", "controlvm", selected_host.vb_name, "poweroff", "--type", "headless"],
-                               stdout=subprocess.PIPE)
-
+            turn_off_vm(selected_host, headers, ip_address)
         else:
-            choose = check_input('Host selected is off. Would you like to turn on?[Y/n]')
-
-            if choose.upper() != "N":
-                print(selected_host.vb_name)
-                subprocess.run(["VBoxManage", "startvm", selected_host.vb_name, "--type", "headless"],
-                               stdout=subprocess.PIPE)
+            turn_on_vm(selected_host, headers, ip_address)
 
 
 main()
